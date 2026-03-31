@@ -1,0 +1,2 @@
+backend/models/spam_transformer.pth filter=lfs diff=lfs merge=lfs -text
+backend/vocab.pkl filter=lfs diff=lfs merge=lfs -text

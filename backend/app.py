@@ -211,10 +211,11 @@ def health():
 if __name__ == '__main__':
     # Load model before starting server
     if load_model():
+        port = int(os.environ.get('PORT', 5000))
         print("\n" + "=" * 60)
-        print("Server starting on http://localhost:5000")
+        print(f"Server starting on http://0.0.0.0:{port}")
         print("=" * 60 + "\n")
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        app.run(debug=False, host='0.0.0.0', port=port)
     else:
         print("\nERROR: Model not loaded. Please train the model first with:")
         print("python backend/train.py")
