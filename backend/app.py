@@ -69,7 +69,7 @@ def load_model():
     # Load trained weights
     model_save_path = os.path.join(PROJECT_ROOT, 'backend', 'models', 'spam_transformer.pth')
     if os.path.exists(model_save_path):
-        checkpoint = torch.load(model_save_path, map_location=device)
+        checkpoint = torch.load(model_save_path, map_location=device, weights_only=False)
         model.load_state_dict(checkpoint['model_state_dict'])
         best_threshold = float(checkpoint.get('best_threshold', 0.5))
         print(f"Model weights loaded (threshold={best_threshold:.2f})")
@@ -211,11 +211,10 @@ def health():
 if __name__ == '__main__':
     # Load model before starting server
     if load_model():
-        port = int(os.environ.get('PORT', 5000))
         print("\n" + "=" * 60)
-        print(f"Server starting on http://0.0.0.0:{port}")
+        print("Server starting on http://localhost:5000")
         print("=" * 60 + "\n")
-        app.run(debug=False, host='0.0.0.0', port=port)
+        app.run(debug=True, host='0.0.0.0', port=5000)
     else:
         print("\nERROR: Model not loaded. Please train the model first with:")
         print("python backend/train.py")

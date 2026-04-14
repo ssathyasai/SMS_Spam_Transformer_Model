@@ -30,7 +30,7 @@ body {
     padding: 40px 20px;
     color: var(--text-primary);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     transition: background-color 0.2s;
 }
