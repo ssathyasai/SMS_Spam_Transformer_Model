@@ -1,50 +1,89 @@
-# SMS Spam Detector
+# 🛡️ SMS Spam Detector
 
-A web application that detects spam SMS messages using a custom-built Transformer deep learning model. Built from scratch with PyTorch, Flask, and vanilla JavaScript.
+> An AI-powered web application that detects SMS spam messages in real time using a custom Transformer deep learning model built from scratch with PyTorch and deployed with Streamlit.
 
----
-
-## What it does
-
-- Paste any SMS message and instantly know if it's **Spam or Ham**
-- Shows confidence score and detected spam signals
-- Background flashes **red** for spam, **green** for ham
-- Upload a `.txt` file to analyze multiple messages at once
-- Download a full detection report
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://smsspamtransformermodel-y3.streamlit.app)
 
 ---
 
-## Project Structure
+## 🚀 Live Demo
+
+**👉 [https://smsspamtransformermodel-y3.streamlit.app](https://smsspamtransformermodel-y3.streamlit.app)**
+
+---
+
+## ✨ Features
+
+- **Single Message Detection** — Paste any SMS and instantly get SPAM or HAM verdict with confidence score, spam probability, and risk level
+- **Spam Signal Indicators** — Highlights detected spam signals (FREE, WIN, URGENT, CLICK, money amounts, URLs, etc.)
+- **Batch Processing** — Upload a `.txt` file with multiple messages and get a full breakdown with stats
+- **Report Generation** — Download a detailed spam detection report for uploaded files
+- **Model Statistics** — View accuracy, precision, recall, F1-score, architecture details, and baseline comparison
+
+---
+
+## 📊 Model Performance
+
+| Metric    | Score  |
+|-----------|--------|
+| Accuracy  | 98.92% |
+| Precision | 97.81% |
+| Recall    | 94.51% |
+| F1-Score  | 96.13% |
+
+---
+
+## 🏗️ Model Architecture
 
 ```
-SMS-Spam-Detector/
-├── frontend/
-│   ├── index.html       # UI
-│   ├── style.css        # Dark theme styling
-│   └── script.js        # API calls and animations
-├── backend/
-│   ├── model.py         # Transformer architecture
-│   ├── train.py         # Training loop
-│   ├── predict.py       # Inference logic
-│   ├── preprocess.py    # Text cleaning and tokenization
-│   ├── app.py           # Flask API server
-│   └── config.py        # Hyperparameters
+Input SMS Message
+       ↓
+Text Cleaning + Tokenization + Padding (length = 150)
+       ↓
+GloVe 300d Word Embeddings + Positional Encoding
+       ↓
+Encoder × 3  (Multi-Head Self-Attention + Feed Forward)
+       ↓
+Decoder × 3  (Cross-Attention + Learnable Memory Vectors)
+       ↓
+Linear Layers  (256 → 128 → 64 → 1)
+       ↓
+Sigmoid → Probability → Threshold → SPAM / HAM
+```
+
+---
+
+## 📁 Project Structure
+
+```
+SMS_SpamDetector/
+├── streamlit_app.py       ← Main Streamlit app (entry point)
+├── requirements.txt       ← Python dependencies
+├── README.md
+├── src/
+│   ├── config.py          ← Hyperparameters and settings
+│   ├── model.py           ← Transformer architecture
+│   ├── preprocess.py      ← Text cleaning and tokenization
+│   ├── predict.py         ← Prediction logic
+│   └── train.py           ← Model training loop
+├── models/
+│   ├── spam_transformer.pth  ← Trained model weights
+│   └── vocab.pkl             ← Vocabulary mappings
 ├── data/
-│   └── sms_spam.csv     # Training dataset (5771 messages)
-├── run.py               # Main entry point
-├── requirements.txt     # Python dependencies
-└── .gitignore
+│   └── spam.csv           ← Training dataset (5,572 messages)
+└── docs/
+    └── data_preprocessing_diagram.png
 ```
 
 ---
 
-## How to Run Locally
+## ⚙️ Run Locally
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/sms-spam-detector.git
-cd sms-spam-detector
+git clone https://github.com/yourusername/SMS_SpamDetector.git
+cd SMS_SpamDetector
 ```
 
 ### 2. Create a virtual environment
@@ -65,83 +104,79 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Train the model
+### 4. Run the app
 
 ```bash
-python run.py --train
+streamlit run streamlit_app.py
+```
+
+---
+
+## 🔧 Train the Model (Optional)
+
+If you want to retrain the model on your own:
+
+```bash
+cd src
+python train.py
 ```
 
 This will:
-- Load and preprocess the dataset
-- Train the Transformer model for up to 50 epochs
-- Save the best model to `backend/models/spam_transformer.pth`
-- Save the vocabulary to `backend/vocab.pkl`
+- Load and preprocess `data/spam.csv`
+- Train the Transformer for up to 50 epochs with early stopping
+- Auto-tune the best classification threshold on validation set
+- Save best weights to `models/spam_transformer.pth`
+- Save vocabulary to `models/vocab.pkl`
 
-Training takes around 5–15 minutes depending on your machine.
+---
 
-### 5. Start the server
+## 🛠️ Tech Stack
 
+| Layer | Technology |
+|---|---|
+| Deep Learning | PyTorch |
+| NLP | Custom Tokenizer + GloVe 300d |
+| Model | Custom Transformer (Encoder-Decoder) |
+| Frontend | Streamlit |
+| Language | Python 3.10 |
+| ML Utils | Scikit-learn, NumPy, Pandas |
+
+---
+
+## 📦 Requirements
+
+```
+streamlit
+torch
+scikit-learn
+pandas
+numpy
+tqdm
+```
+
+Install all with:
 ```bash
-python backend/app.py
-```
-
-### 6. Open the app
-
-Go to `http://localhost:5000` in your browser.
-
----
-
-## Model Architecture
-
-```
-Input SMS
-    ↓
-Word Embedding + Positional Encoding
-    ↓
-Encoder × 3  (Self-Attention + FeedForward)
-    ↓
-Decoder × 3  (Cross-Attention with Memory Vectors)
-    ↓
-Linear Layers → Sigmoid
-    ↓
-Spam or Ham
+pip install -r requirements.txt
 ```
 
 ---
 
-## Performance
+## 📂 Dataset
 
-| Metric    | Score  |
-|-----------|--------|
-| Accuracy  | 98.92% |
-| Precision | 0.9781 |
-| Recall    | 0.9451 |
-| F1-Score  | 0.9613 |
+Uses the [UCI SMS Spam Collection](https://archive.ics.uci.edu/ml/datasets/SMS+Spam+Collection) dataset — 5,572 labeled SMS messages (spam + ham).
 
 ---
 
-## Requirements
+## 👨‍💻 Authors
 
-- Python 3.8+
-- PyTorch
-- Flask
-- scikit-learn
-- pandas
-- numpy
-- tqdm
+**S. Sathyasai** — [23B81A67A6]
 
-All listed in `requirements.txt`.
+**T. Srikar Reddy** — [23B81A67B3]
+
+CVR College of Engineering · Department of Computer Science and Engineering
 
 ---
 
-## Dataset
+## 📄 License
 
-Uses the [UCI SMS Spam Collection](https://archive.ics.uci.edu/ml/datasets/SMS+Spam+Collection) dataset with additional tricky spam/ham examples added for better generalization.
-
----
-
-## Author
-
-Sathyasai
-
-Srikar
+This project is built for academic purposes at CVR College of Engineering.
