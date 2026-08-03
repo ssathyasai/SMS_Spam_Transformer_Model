@@ -34,6 +34,17 @@ class SpamPredictor:
         signal_count = sum(1 for pat in tricky_patterns if re.search(pat, text_lower))
         return signal_count
 
+    def _detect_legit_ham_signals(self, text):
+        """Detect legitimate work, interview, meeting, personal, and transactional ham patterns"""
+        ham_patterns = [
+            r'interview\s+(for|at|on|scheduled)', r'intern(ship)?\b', r'candidate', r'recruitment', r'hr\s+team',
+            r'teams\s+link', r'zoom\s+link', r'meet\s+link', r'meeting\s+id', r'scheduled\s+for',
+            r'application\s+status', r'resume', r'verification\s+code', r'otp\s+is', r'job\s+offer',
+            r'call\s+me\b', r'reach\s+home', r'driving', r'see\s+you', r'let\s+me\s+know', r'pick\s+up'
+        ]
+        text_lower = text.lower()
+        return sum(1 for pat in ham_patterns if re.search(pat, text_lower))
+
     def predict_single(self, text):
         """
         Predict whether a single SMS is spam or ham
@@ -43,7 +54,7 @@ class SpamPredictor:
         2. Tokenize and convert to indices
         3. Pad to max length
         4. Run through model
-        5. Apply signal booster for tricky/obfuscated messages
+        5. Apply signal booster/dampener for tricky messages
         6. Return prediction and confidence
         """
         # Clean text
@@ -73,10 +84,14 @@ class SpamPredictor:
             output = self.model(input_tensor)
             probability = output.item()
         
-        # Apply heuristic booster for tricky obfuscated/phishing messages
-        signal_count = self._detect_tricky_spam_boost(text)
-        if signal_count >= 1 and probability >= 0.35:
-            probability = min(0.99, probability + 0.20 * signal_count)
+        # Apply heuristic booster / dampener for tricky messages
+        spam_signals = self._detect_tricky_spam_boost(text)
+        ham_signals = self._detect_legit_ham_signals(text)
+        
+        if spam_signals >= 1 and probability >= 0.35:
+            probability = min(0.99, probability + 0.20 * spam_signals)
+        elif ham_signals >= 1 and spam_signals == 0:
+            probability = max(0.01, probability - 0.25 * ham_signals)
         
         # Determine prediction using tuned threshold
         is_spam = probability >= self.threshold
