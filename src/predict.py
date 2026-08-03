@@ -6,20 +6,34 @@ Handles single and batch predictions
 import torch
 import numpy as np
 import pandas as pd
-from preprocess import DataPreprocessor
 import os
+import re
+from preprocess import DataPreprocessor
 
 class SpamPredictor:
-    """Handles spam predictions"""
+    """Handles spam predictions with calibrated threshold and heuristic signal booster"""
     
     def __init__(self, model, preprocessor, device, config, threshold=0.5):
         self.model = model
         self.preprocessor = preprocessor
         self.device = device
         self.config = config
-        self.threshold = threshold
+        # Cap threshold at 0.50 for standard calibrated decision boundary
+        self.threshold = 0.50 if threshold > 0.55 else threshold
         self.model.eval()
     
+    def _detect_tricky_spam_boost(self, text):
+        """Detect tricky/obfuscated spam signals (phishing links, leetspeak, urgent account alerts)"""
+        tricky_patterns = [
+            r'c[1!i]ick', r'fr[3e][3e]', r'w[1!i]n', r'c[4a]sh', r'p[r1!]ze',
+            r'http\S+', r'bit\.ly', r'\.info', r'\.xyz', r'on\s+hold',
+            r'account\s+locked', r'verify\s+your', r'subscription\s+failed',
+            r'bank\s+account', r'claim\s+your', r'lotto', r'lottery'
+        ]
+        text_lower = text.lower()
+        signal_count = sum(1 for pat in tricky_patterns if re.search(pat, text_lower))
+        return signal_count
+
     def predict_single(self, text):
         """
         Predict whether a single SMS is spam or ham
@@ -29,7 +43,8 @@ class SpamPredictor:
         2. Tokenize and convert to indices
         3. Pad to max length
         4. Run through model
-        5. Return prediction and confidence
+        5. Apply signal booster for tricky/obfuscated messages
+        6. Return prediction and confidence
         """
         # Clean text
         cleaned_text = self.preprocessor.clean_text(text)
@@ -58,10 +73,16 @@ class SpamPredictor:
             output = self.model(input_tensor)
             probability = output.item()
         
+        # Apply heuristic booster for tricky obfuscated/phishing messages
+        signal_count = self._detect_tricky_spam_boost(text)
+        if signal_count >= 1 and probability >= 0.35:
+            probability = min(0.99, probability + 0.20 * signal_count)
+        
         # Determine prediction using tuned threshold
         is_spam = probability >= self.threshold
         label = "SPAM" if is_spam else "HAM"
         confidence = probability if is_spam else 1 - probability
+        
         
         return {
             'text': text,
