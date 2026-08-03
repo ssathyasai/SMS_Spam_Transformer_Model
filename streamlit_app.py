@@ -654,18 +654,18 @@ with tab3:
             ("Feedforward Size",    "d_ff = 512"),
             ("Classification Head", "256 → 128 → 64 → 1"),
             ("Output Activation",   "Sigmoid → probability"),
-            ("Max Sequence Length", "150 tokens"),
+            ("Max Sequence Length", "70 tokens"),
         ], columns=["Component", "Details"]), use_container_width=True, hide_index=True)
 
     with col2:
         st.markdown('<div class="section-title">⚙️ Training Configuration</div>', unsafe_allow_html=True)
         st.dataframe(pd.DataFrame([
-            ("Optimizer",         "AdamW  (lr = 0.0005)"),
+            ("Optimizer",         "AdamW  (lr = 0.001)"),
             ("Loss Function",     "Binary Cross Entropy"),
-            ("Batch Size",        "32"),
-            ("Max Epochs",        "50"),
-            ("Early Stopping",    "Patience = 15"),
-            ("Warmup Steps",      "20"),
+            ("Batch Size",        "64"),
+            ("Max Epochs",        "12"),
+            ("Early Stopping",    "Patience = 5"),
+            ("Warmup Steps",      "10"),
             ("Dropout Rate",      "0.25"),
             ("Gradient Clipping", "max norm = 1.0"),
             ("Threshold Tuning",  "Auto on validation set"),
