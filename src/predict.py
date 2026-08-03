@@ -43,12 +43,12 @@ class SpamPredictor:
             r'application\s+status', r'resume', r'verification\s+code', r'otp\s+is', r'job\s+offer',
             # Personal & Casual
             r'call\s+me\b', r'reach\s+home', r'driving', r'see\s+you', r'let\s+me\s+know', r'pick\s+up',
-            # Transactional & Order / Delivery / Payment updates
+            # Transactional & Order / Delivery / Payment / Utility updates
             r'order\s+(has\s+been\s+)?(confirmed|placed|shipped|delivered)', r'food\s+order', r'out\s+for\s+delivery',
-            r'will\s+be\s+delivered', r'delivery\s+(expected|agent|boy|driver)', r'package\s+has\s+been',
+            r'will\s+be\s+delivered', r'delivery\s+(expected|agent|boy|driver|status)', r'package\s+has\s+been',
             r'payment\s+(of|received|successful|confirmed)', r'account\s+(debited|credited)',
             r'transaction\s+(successful|id|reference)', r'booking\s+confirmed', r'cab\s+is\s+on\s+the\s+way',
-            r'ride\s+confirmed', r'pnr\b', r'seat\s+no'
+            r'ride\s+confirmed', r'pnr\b', r'seat\s+no', r'food\b', r'delivered\b', r'confirmed\b', r'dispatched\b'
         ]
         text_lower = text.lower()
         return sum(1 for pat in ham_patterns if re.search(pat, text_lower))
@@ -99,7 +99,7 @@ class SpamPredictor:
         if spam_signals >= 1 and probability >= 0.35:
             probability = min(0.99, probability + 0.20 * spam_signals)
         elif ham_signals >= 1 and spam_signals == 0:
-            probability = max(0.01, probability - 0.25 * ham_signals)
+            probability = max(0.01, probability - 0.35 * ham_signals)
         
         # Determine prediction using tuned threshold
         is_spam = probability >= self.threshold
