@@ -15,20 +15,20 @@ class Config:
     LINEAR_DROPOUT = 0.3
     
     # Training Parameters
-    BATCH_SIZE = 32
-    LEARNING_RATE = 0.0005
-    WARMUP_STEPS = 20
-    NUM_EPOCHS = 50
-    EARLY_STOPPING_PATIENCE = 15
+    BATCH_SIZE = 64
+    LEARNING_RATE = 0.001
+    WARMUP_STEPS = 10
+    NUM_EPOCHS = 12
+    EARLY_STOPPING_PATIENCE = 5
     
     # Data Parameters
-    MAX_SEQUENCE_LENGTH = 150
+    MAX_SEQUENCE_LENGTH = 70
     EMBEDDING_DIM = 300  # GloVe 300d
     VOCAB_SIZE = 50000
     
     # Paths
-    MODEL_SAVE_PATH = 'backend/models/spam_transformer.pth'
-    GLOVE_PATH = 'backend/glove.840B.300d.txt'  # Will download if not exists
+    MODEL_SAVE_PATH = 'models/spam_transformer.pth'
+    GLOVE_PATH = 'models/glove.840B.300d.txt'  # Will download if not exists
     
     # Device
     DEVICE = 'cuda'  # Will be auto-detected
