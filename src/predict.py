@@ -42,13 +42,14 @@ class SpamPredictor:
             r'admit\s+card', r'hall\s+ticket', r'datesheet', r'semester', r'assignment', r'submission',
             r'results?\s+(declared|uploaded|published)', r'attendance', r'faculty', r'department', r'class\s+schedule',
             # Work, Career, Office & Meetings
-            r'interview\s+(for|at|on|scheduled)', r'intern(ship)?\b', r'candidate', r'recruitment', r'hr\s+team',
+            r'\binterview\b', r'intern(ship)?\b', r'candidate', r'recruitment', r'hr\s+team',
             r'teams\s+link', r'zoom\s+link', r'meet\s+link', r'meeting\s+id', r'scheduled\s+for',
             r'application\s+status', r'resume', r'job\s+offer',
             r'meeting\s+(has\s+been\s+)?(rescheduled|scheduled|postponed|cancelled|moved)', r'project\s+meeting',
             r'rescheduled\s+to', r'presentation', r'laptop\b', r'slides\b', r'office\b', r'standup\b', r'team\s+meeting',
-            # Personal & Casual
+            # Personal, Appreciation & Casual
             r'call\s+me\b', r'reach\s+home', r'driving', r'see\s+you', r'let\s+me\s+know', r'pick\s+up', r'dinner', r'mom\b', r'dad\b',
+            r'thanks?\b', r'thank\s+you\b', r'prepare\b', r'prep\b', r'suggestions?\b', r'useful\b', r'helpful\b', r'appreciate\b',
             # Transactional & Banking & OTP
             r'otp\s+(is|for|code)', r'verification\s+code', r'one\s+time\s+password', r'netbanking',
             r'account\s+(debited|credited|xx)', r'debited\s+by', r'credited\s+by', r'txn\s+id', r'ref\s+no', r'upi\s+id',
