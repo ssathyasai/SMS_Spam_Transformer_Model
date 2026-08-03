@@ -464,7 +464,8 @@ with tab1:
     st.markdown('<div class="section-title">✏️ Enter SMS Message</div>', unsafe_allow_html=True)
 
     message = st.text_area(
-        label="",
+        label="SMS Message Input",
+        label_visibility="collapsed",
         placeholder='Paste your SMS message here...\nExample: "Congratulations! You\'ve won a FREE $1000 gift card. Click here to claim now!"',
         height=130,
         key="single_msg"
@@ -551,7 +552,7 @@ with tab2:
     st.markdown('<div class="ibox">Upload a <strong>.txt</strong> file with one SMS message per line. The system will classify every message and show a full breakdown.</div>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
-    uploaded_file = st.file_uploader("", type=["txt"], key="batch_file")
+    uploaded_file = st.file_uploader(label="Batch File Upload", label_visibility="collapsed", type=["txt"], key="batch_file")
 
     if uploaded_file:
         b1, b2 = st.columns(2)
