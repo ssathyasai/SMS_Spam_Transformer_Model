@@ -59,7 +59,7 @@ class SpamPredictor:
             probability = output.item()
         
         # Determine prediction using tuned threshold
-        is_spam = probability > self.threshold
+        is_spam = probability >= self.threshold
         label = "SPAM" if is_spam else "HAM"
         confidence = probability if is_spam else 1 - probability
         
