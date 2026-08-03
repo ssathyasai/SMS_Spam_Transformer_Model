@@ -35,8 +35,12 @@ class SpamPredictor:
         return signal_count
 
     def _detect_legit_ham_signals(self, text):
-        """Detect legitimate work, interview, meeting, office, personal, transactional, delivery, and utility ham patterns"""
+        """Detect legitimate work, academic, interview, meeting, office, personal, transactional, delivery, and utility ham patterns"""
         ham_patterns = [
+            # Academic, University & Campus
+            r'dear\s+student', r'examination', r'timetable', r'university', r'college', r'portal',
+            r'admit\s+card', r'hall\s+ticket', r'datesheet', r'semester', r'assignment', r'submission',
+            r'results?\s+(declared|uploaded|published)', r'attendance', r'faculty', r'department',
             # Work, Career, Office & Meetings
             r'interview\s+(for|at|on|scheduled)', r'intern(ship)?\b', r'candidate', r'recruitment', r'hr\s+team',
             r'teams\s+link', r'zoom\s+link', r'meet\s+link', r'meeting\s+id', r'scheduled\s+for',
