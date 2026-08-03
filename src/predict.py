@@ -35,12 +35,20 @@ class SpamPredictor:
         return signal_count
 
     def _detect_legit_ham_signals(self, text):
-        """Detect legitimate work, interview, meeting, personal, and transactional ham patterns"""
+        """Detect legitimate work, interview, meeting, personal, transactional, delivery, and utility ham patterns"""
         ham_patterns = [
+            # Work & Career
             r'interview\s+(for|at|on|scheduled)', r'intern(ship)?\b', r'candidate', r'recruitment', r'hr\s+team',
             r'teams\s+link', r'zoom\s+link', r'meet\s+link', r'meeting\s+id', r'scheduled\s+for',
             r'application\s+status', r'resume', r'verification\s+code', r'otp\s+is', r'job\s+offer',
-            r'call\s+me\b', r'reach\s+home', r'driving', r'see\s+you', r'let\s+me\s+know', r'pick\s+up'
+            # Personal & Casual
+            r'call\s+me\b', r'reach\s+home', r'driving', r'see\s+you', r'let\s+me\s+know', r'pick\s+up',
+            # Transactional & Order / Delivery / Payment updates
+            r'order\s+(has\s+been\s+)?(confirmed|placed|shipped|delivered)', r'food\s+order', r'out\s+for\s+delivery',
+            r'will\s+be\s+delivered', r'delivery\s+(expected|agent|boy|driver)', r'package\s+has\s+been',
+            r'payment\s+(of|received|successful|confirmed)', r'account\s+(debited|credited)',
+            r'transaction\s+(successful|id|reference)', r'booking\s+confirmed', r'cab\s+is\s+on\s+the\s+way',
+            r'ride\s+confirmed', r'pnr\b', r'seat\s+no'
         ]
         text_lower = text.lower()
         return sum(1 for pat in ham_patterns if re.search(pat, text_lower))
