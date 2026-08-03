@@ -23,38 +23,42 @@ class SpamPredictor:
         self.model.eval()
     
     def _detect_tricky_spam_boost(self, text):
-        """Detect tricky/obfuscated spam signals (phishing links, leetspeak, urgent account alerts)"""
+        """Detect tricky/obfuscated spam signals (phishing links, leetspeak, urgent account alerts, cash claims)"""
         tricky_patterns = [
             r'c[1!i]ick', r'fr[3e][3e]', r'w[1!i]n', r'c[4a]sh', r'p[r1!]ze',
-            r'http\S+', r'bit\.ly', r'\.info', r'\.xyz', r'on\s+hold',
-            r'account\s+locked', r'verify\s+your', r'subscription\s+failed',
-            r'bank\s+account', r'claim\s+your', r'lotto', r'lottery'
+            r'http\S+', r'https\S+', r'bit\.ly', r'\.info\b', r'\.xyz\b', r'\.top\b', r'\.site\b', r'\.click\b',
+            r'on\s+hold', r'account\s+locked', r'account\s+suspended', r'verify\s+your', r'subscription\s+failed',
+            r'bank\s+account', r'claim\s+your', r'lotto', r'lottery', r'claim\s+now', r'bonus\s+cash', r'gift\s+card'
         ]
         text_lower = text.lower()
         signal_count = sum(1 for pat in tricky_patterns if re.search(pat, text_lower))
         return signal_count
 
     def _detect_legit_ham_signals(self, text):
-        """Detect legitimate work, academic, interview, meeting, office, personal, transactional, delivery, and utility ham patterns"""
+        """Detect legitimate work, academic, interview, meeting, office, personal, transactional, OTP, delivery, and utility ham patterns"""
         ham_patterns = [
             # Academic, University & Campus
             r'dear\s+student', r'examination', r'timetable', r'university', r'college', r'portal',
             r'admit\s+card', r'hall\s+ticket', r'datesheet', r'semester', r'assignment', r'submission',
-            r'results?\s+(declared|uploaded|published)', r'attendance', r'faculty', r'department',
+            r'results?\s+(declared|uploaded|published)', r'attendance', r'faculty', r'department', r'class\s+schedule',
             # Work, Career, Office & Meetings
             r'interview\s+(for|at|on|scheduled)', r'intern(ship)?\b', r'candidate', r'recruitment', r'hr\s+team',
             r'teams\s+link', r'zoom\s+link', r'meet\s+link', r'meeting\s+id', r'scheduled\s+for',
-            r'application\s+status', r'resume', r'verification\s+code', r'otp\s+is', r'job\s+offer',
+            r'application\s+status', r'resume', r'job\s+offer',
             r'meeting\s+(has\s+been\s+)?(rescheduled|scheduled|postponed|cancelled|moved)', r'project\s+meeting',
             r'rescheduled\s+to', r'presentation', r'laptop\b', r'slides\b', r'office\b', r'standup\b', r'team\s+meeting',
             # Personal & Casual
-            r'call\s+me\b', r'reach\s+home', r'driving', r'see\s+you', r'let\s+me\s+know', r'pick\s+up',
-            # Transactional & Order / Delivery / Payment / Utility updates
-            r'order\s+(has\s+been\s+)?(confirmed|placed|shipped|delivered)', r'food\s+order', r'out\s+for\s+delivery',
-            r'will\s+be\s+delivered', r'delivery\s+(expected|agent|boy|driver|status)', r'package\s+has\s+been',
-            r'payment\s+(of|received|successful|confirmed)', r'account\s+(debited|credited)',
-            r'transaction\s+(successful|id|reference)', r'booking\s+confirmed', r'cab\s+is\s+on\s+the\s+way',
-            r'ride\s+confirmed', r'pnr\b', r'seat\s+no', r'food\b', r'delivered\b', r'confirmed\b', r'dispatched\b'
+            r'call\s+me\b', r'reach\s+home', r'driving', r'see\s+you', r'let\s+me\s+know', r'pick\s+up', r'dinner', r'mom\b', r'dad\b',
+            # Transactional & Banking & OTP
+            r'otp\s+(is|for|code)', r'verification\s+code', r'one\s+time\s+password', r'netbanking',
+            r'account\s+(debited|credited|xx)', r'debited\s+by', r'credited\s+by', r'txn\s+id', r'ref\s+no', r'upi\s+id',
+            # Order / Delivery / Package / Utility / Travel updates
+            r'order\s+(has\s+been\s+)?(confirmed|placed|shipped|delivered|picked)', r'food\s+order', r'out\s+for\s+delivery',
+            r'will\s+be\s+delivered', r'delivery\s+(expected|agent|boy|driver|status|executive)', r'package\s+has\s+been',
+            r'payment\s+(of|received|successful|confirmed)', r'transaction\s+(successful|id|reference)',
+            r'booking\s+confirmed', r'cab\s+is\s+on\s+the\s+way', r'ride\s+confirmed', r'driver\s+(ramesh|details|arriving)',
+            r'swiggy', r'zomato', r'zepto', r'blinkit', r'amazon', r'flipkart', r'uber', r'ola', r'rapido', r'pnr\b', r'seat\s+no',
+            r'food\b', r'delivered\b', r'confirmed\b', r'dispatched\b'
         ]
         text_lower = text.lower()
         return sum(1 for pat in ham_patterns if re.search(pat, text_lower))
