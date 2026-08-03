@@ -397,7 +397,11 @@ def detect_signals(text):
 # LOAD MODEL
 # ════════════════════════════════════════════════════════════
 @st.cache_resource(show_spinner=False)
-def load_model():
+def load_model(_version="v3.1_dampener_update"):
+    import importlib
+    import predict
+    importlib.reload(predict)
+    from predict import SpamPredictor
     device      = Config.get_device()
     preprocessor = DataPreprocessor(max_length=Config.MAX_SEQUENCE_LENGTH)
     vocab_path  = os.path.join(MODEL_DIR, 'vocab.pkl')
