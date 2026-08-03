@@ -121,16 +121,17 @@ class Trainer:
         if tune_threshold:
             best_f1 = -1.0
             best_t = 0.5
-            for t in np.arange(0.1, 0.91, 0.05):
-                preds_t = (np.array(probabilities) > t).astype(float)
+            for t in np.linspace(0.1, 0.9, 81):
+                t_val = round(float(t), 2)
+                preds_t = (np.array(probabilities) >= t_val).astype(float)
                 f1_t = f1_score(true_labels, preds_t, zero_division=0)
                 if f1_t > best_f1:
                     best_f1 = f1_t
-                    best_t = float(t)
+                    best_t = t_val
             self.best_threshold = best_t
             threshold = best_t
 
-        predictions = (np.array(probabilities) > threshold).astype(float)
+        predictions = (np.array(probabilities) >= threshold).astype(float)
 
         # Calculate metrics
         avg_loss = total_loss / len(val_loader)
@@ -230,7 +231,7 @@ class Trainer:
             path = self.config.MODEL_SAVE_PATH
         
         if os.path.exists(path):
-            checkpoint = torch.load(path, map_location=self.device)
+            checkpoint = torch.load(path, map_location=self.device, weights_only=False)
             self.model.load_state_dict(checkpoint['model_state_dict'])
             self.best_threshold = float(checkpoint.get('best_threshold', 0.5))
             print(f"Model loaded from {path}")
@@ -238,3 +239,41 @@ class Trainer:
         else:
             print(f"No model found at {path}")
             return False
+
+if __name__ == '__main__':
+    from config import Config
+    from preprocess import DataPreprocessor
+    from model import SpamTransformerWithEmbeddings
+    import os
+
+    config = Config()
+    device = config.get_device()
+    print(f"Using device: {device}")
+
+    preprocessor = DataPreprocessor(
+        max_length=config.MAX_SEQUENCE_LENGTH,
+        vocab_size=config.VOCAB_SIZE
+    )
+
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_path = os.path.join(base_dir, 'data', 'spam.csv')
+    data_splits = preprocessor.load_and_preprocess_data(data_path)
+
+    vocab_save_path = os.path.join(base_dir, 'models', 'vocab.pkl')
+    preprocessor.save_vocabulary(vocab_save_path)
+
+    dataloaders = preprocessor.create_dataloaders(data_splits, batch_size=config.BATCH_SIZE)
+
+    model = SpamTransformerWithEmbeddings(
+        vocab_size=len(preprocessor.word2idx),
+        d_model=config.MODEL_SIZE,
+        num_heads=config.ATTENTION_HEADS,
+        num_encoder_layers=config.ENCODER_LAYERS,
+        num_decoder_layers=config.DECODER_LAYERS,
+        d_ff=config.FEEDFORWARD_SIZE,
+        dropout=config.DROPOUT_RATE,
+        memory_length=config.MEMORY_LENGTH
+    ).to(device)
+
+    trainer = Trainer(model, device, config)
+    trainer.train(dataloaders['train'], dataloaders['val'], epochs=config.NUM_EPOCHS)
